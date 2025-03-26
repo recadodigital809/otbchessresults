@@ -1,15 +1,19 @@
+<!-- index.php -->
 <?php
 
+require_once __DIR__ . '/templates/header.php';
 require_once __DIR__ . '/database/connection.php';
 
-try {
-    $pdo = getDBConnection();
-    echo "<p>✅ Conexión a la base de datos establecida correctamente.</p>";
+?>
 
-    // Ejemplo: Obtener la versión de MySQL
-    $stmt = $pdo->query("SELECT VERSION() AS mysql_version");
-    $row = $stmt->fetch();
-    echo "<p>Versión de MySQL: " . htmlspecialchars($row['mysql_version']) . "</p>";
-} catch (Exception $e) {
-    echo "<p>❌ Error: " . htmlspecialchars($e->getMessage()) . "</p>";
-}
+<div class="container mt-5 text-center">
+    <h1>Welcome to Over The Board Chess Results</h1>
+    <p class="lead">Manage players, tournaments and matches easily.</p>
+    <img src="img\shutterstock_22825027.jpg" alt="Chess Piece" class="img-fluid my-3" style="width: 50%;">
+    <div>
+        <a href="nuevo_torneo.php" class="btn btn-primary btn-sm">New Tournament</a>
+        <a href="agregar_jugadores_torneo.php" class="btn btn-success btn-sm">Add Chess Player</a>
+    </div>
+</div>
+
+<?php include __DIR__ . '/templates/footer.php'; ?>
