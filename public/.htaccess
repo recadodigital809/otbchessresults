@@ -1,0 +1,4 @@
+# En tu .htaccess
+<Files ".env">
+    Require all denied
+</Files>
