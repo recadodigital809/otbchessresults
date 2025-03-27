@@ -1,0 +1,25 @@
+# Excluir carpeta vendor (dependencias de Composer)
+/vendor/
+
+# Excluir archivos de entorno
+.env
+
+# Archivos generados por el sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de IDEs/Editores
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cache de PHPUnit
+.phpunit.result.cache
+
+# Archivos de log locales
+*.log
+php_errors.log
+
+# Archivos temporales de Composer
+composer.phar
