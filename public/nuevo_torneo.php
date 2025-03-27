@@ -1,90 +1,108 @@
 <?php
-require_once 'vendor/autoload.php';
+
 require_once __DIR__ . '/database/connection.php';
 include __DIR__ . '/templates/header.php';
-
-// Verificar autenticación
-session_start();
-if (!isset($_SESSION['usuario'])) {
-    header('Location: /login.php');
-    exit();
-}
-
-// variables de entorno están cargadas correctamente
-var_dump($_ENV['GOOGLE_CLIENT_ID'], $_ENV['GOOGLE_CLIENT_SECRET']);
-
-
-// Configurar conexión
-$pdo = getDBConnection();
-
-// Generar y regenerar CSRF token
-if (empty($_SESSION['csrf_token']) || $_SERVER["REQUEST_METHOD"] == "POST") {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 
 $mensaje = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    try {
-        // Validar CSRF
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            throw new Exception("Token CSRF inválido");
-        }
+    // Obtener los datos del formulario
+    $nombre = trim($_POST["nombre"]);
+    $fecha_inicio = DateTime::createFromFormat('Y-m-d', $_POST["fecha_inicio"]);
 
-        // Sanitizar y validar entrada
-        $nombre = trim($_POST["nombre"] ?? "");
-        $fecha_inicio = trim($_POST["fecha_inicio"] ?? "");
-        $tipo = trim($_POST["tipo"] ?? "");
-        $sistema = trim($_POST["sistema"] ?? "");
+    if (!$fecha_inicio) {
+        $mensaje = "<div class='alert alert-danger'>Fecha de inicio inválida.</div>";
+    } else {
+        $fecha_formateada = $fecha_inicio->format('Y-m-d'); // Definir una variable separada
+        $tipo = trim($_POST["tipo"]);
+        $sistema = trim($_POST["sistema"]);
         $dobleronda = isset($_POST["dobleronda"]) ? 1 : 0;
 
-        if (empty($nombre) || strlen($nombre) > 100) {
-            throw new Exception("Nombre inválido (máx. 100 caracteres)");
-        }
+        try {
+            // Uso de consultas preparadas con PDO
+            $sql = "INSERT INTO db_Torneos (nombre, fecha_inicio, tipo, sistema, dobleronda) VALUES (:nombre, :fecha_inicio, :tipo, :sistema, :dobleronda)";
+            $stmt = $pdo->prepare($sql);
 
-        // Validar fecha
-        $fecha_obj = DateTime::createFromFormat('Y-m-d', $fecha_inicio);
-        if (!$fecha_obj || $fecha_obj < new DateTime()) {
-            throw new Exception("Fecha de inicio inválida o anterior a hoy");
-        }
-        $fecha_formateada = $fecha_obj->format('Y-m-d');
+            // Bind parameters
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':fecha_inicio', $fecha_formateada);
+            $stmt->bindParam(':tipo', $tipo);
+            $stmt->bindParam(':sistema', $sistema);
+            $stmt->bindParam(':dobleronda', $dobleronda, PDO::PARAM_INT);
 
-        // Validar tipo y sistema
-        $tipos_permitidos = ['presencial', 'online'];
-        $sistemas_permitidos = ['round robin', 'sistema suizo', 'eliminación simple', 'eliminación doble'];
-
-        if (!in_array($tipo, $tipos_permitidos, true)) {
-            throw new Exception("Tipo de torneo no válido");
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                $mensaje = "<div class='alert alert-success'>Torneo agregado con éxito.</div>";
+            } else {
+                $mensaje = "<div class='alert alert-danger'>Error: No se pudo agregar el torneo.</div>";
+            }
+        } catch (PDOException $e) {
+            // Manejo de errores de base de datos
+            $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";
         }
-        if (!in_array($sistema, $sistemas_permitidos, true)) {
-            throw new Exception("Sistema de juego no válido");
-        }
-        if ($dobleronda && $sistema !== 'round robin') {
-            throw new Exception("Doble ronda solo disponible para Round Robin");
-        }
-
-        // Insertar en la base de datos
-        $conn->beginTransaction();
-        $stmt = $pdo->prepare("INSERT INTO db_Torneos (nombre, fecha_inicio, tipo, sistema, dobleronda, creador_id) 
-                                VALUES (:nombre, :fecha_inicio, :tipo, :sistema, :dobleronda, :creador_id)");
-        $stmt->execute([
-            ':nombre' => $nombre,
-            ':fecha_inicio' => $fecha_formateada,
-            ':tipo' => $tipo,
-            ':sistema' => $sistema,
-            ':dobleronda' => $dobleronda,
-            ':creador_id' => $_SESSION['usuario']['id']
-        ]);
-        $conn->commit();
-
-        $_SESSION['exito'] = "Torneo creado exitosamente";
-        header("Location: /dashboard.php");
-        exit();
-    } catch (Exception $e) {
-        error_log("Error en nuevo_torneo: " . $e->getMessage() . " - Usuario: " . $_SESSION['usuario']['id']);
-        $mensaje = "<div class='alert alert-danger'>" . htmlspecialchars($e->getMessage()) . "</div>";
-        $conn->rollBack();
     }
 }
 
-include __DIR__ . '/templates/footer.php';
+?>
+
+<div class="container mt-5">
+    <h2 class="text-center">Agregar Nuevo Torneo</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <?= $mensaje; ?>
+            <div class="card shadow-sm p-4">
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Torneo</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" name="fecha_inicio" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Torneo</label>
+                        <select name="tipo" class="form-select" required>
+                            <option value="online">Presencial</option>
+                            <!-- <option value="presencial">Online</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sistema de Juego</label>
+                        <select name="sistema" class="form-select" id="sistema" required>
+                            <option value="round robin">Round Robin</option>
+                            <option value="sistema suizo">Sistema Suizo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Configuración de Rondas</label>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" name="dobleronda" class="form-check-input" id="dobleronda">
+                                <label class="form-check-label" for="dobleronda">Doble Ronda?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-trophy-fill me-2"></i>Crear Torneo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#sistema").change(function() {
+            if ($(this).val() === "round robin") {
+                $("#dobleronda").prop("disabled", false);
+            } else {
+                $("#dobleronda").prop("disabled", true).prop("checked", false);
+            }
+        });
+    });
+</script>
+<?php include __DIR__ . '/templates/footer.php'; ?>
