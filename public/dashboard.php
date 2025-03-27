@@ -1,19 +1,26 @@
 <?php
 session_start();
 
-// Si no hay sesión pero hay cookies, restaurarla
-if (!isset($_SESSION['usuario']) && isset($_COOKIE['google_id'])) {
-    $_SESSION['usuario'] = [
-        'id' => $_COOKIE['google_id'],
-        'nombre' => $_COOKIE['nombre'],
-        'email' => $_COOKIE['email']
-    ];
-}
-
-// Redirigir al login si no hay sesión ni cookies
+// Verificar si el usuario está autenticado
 if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
     exit();
+}
+
+// Protección contra secuestro de sesión (opcional pero recomendado)
+if ($_SESSION['ip'] !== $_SERVER['REMOTE_ADDR'] || $_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+
+// Regenerar ID de sesión periódicamente (cada 10 minutos)
+if (!isset($_SESSION['last_regeneration'])) {
+    $_SESSION['last_regeneration'] = time();
+} elseif (time() - $_SESSION['last_regeneration'] > 600) {
+    session_regenerate_id(true);
+    $_SESSION['last_regeneration'] = time();
 }
 
 echo "Bienvenido, " . htmlspecialchars($_SESSION['usuario']['nombre']);

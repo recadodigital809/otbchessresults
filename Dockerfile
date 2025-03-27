@@ -25,9 +25,7 @@ RUN docker-php-ext-install \
     zip \
     opcache
 
-# Instalar ModSecurity:
-RUN apt-get install -y libapache2-mod-security2 && \
-    mv /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
 
 # Habilitar mod_rewrite
 RUN a2enmod rewrite
