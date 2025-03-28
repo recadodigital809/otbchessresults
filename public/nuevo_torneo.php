@@ -82,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label class="form-label">Tipo de Torneo</label>
                         <select name="tipo" class="form-select" required>
                             <option value="presencial">Presencial</option>
-                            <option value="online">Online</option>
                         </select>
                     </div>
                     <div class="mb-3">

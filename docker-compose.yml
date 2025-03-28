@@ -9,7 +9,7 @@ services:
     volumes:
       - ./public:/var/www/html
       - ./php/php.ini:/usr/local/etc/php/php.ini
-      - php_vendor:/var/www/html/vendor
+      - ./vendor:/var/www/html/vendor
       - php_composer_cache:/root/.composer/cache
     networks:
       - matrix
@@ -20,7 +20,6 @@ services:
       fi && chown -R www-data:www-data /var/www/html/vendor && exec docker-php-entrypoint apache2-foreground"
 
 volumes:
-  php_vendor:
   php_composer_cache:
 
 
