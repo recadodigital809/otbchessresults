@@ -21,7 +21,7 @@ session_start();
 
 // Verificar si ya está autenticado
 if (isset($_SESSION['usuario'])) {
-    header('Location: dashboard.php');
+    header('Location: /dashboard.php');
     exit();
 }
 
@@ -47,6 +47,6 @@ try {
     $authUrl = $client->createAuthUrl();
 } catch (Exception $e) {
     error_log('Error en login: ' . $e->getMessage());
-    header('Location: error.php');
+    header('Location: /error.php');
     exit();
 }

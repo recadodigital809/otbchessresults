@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+//require_once __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
 
@@ -32,10 +32,6 @@ function getDBConnection()
         $password = $_ENV['DB_PASS'];
         $charset = 'utf8mb4';
 
-        // Forzar `mysqldb-v8` si está en Docker
-        if ($host === 'localhost') {
-            $host = 'mysqldb-v8';
-        }
 
         $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
         $options = [
