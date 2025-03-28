@@ -1,34 +1,30 @@
 <?php
 session_start();
 
-// Regenerar el ID de sesión antes de destruirla (seguridad extra)
-session_regenerate_id(true);
-
-// Eliminar todas las variables de sesión
+// 1. Limpiar todas las variables de sesión
 $_SESSION = [];
 
-// Eliminar las cookies de sesión (si las hay)
-if (isset($_COOKIE[session_name()])) {
-    setcookie(session_name(), "", time() - 42000, "/", "otbchessresults.com", true, true);
-}
-
-// Destruir la sesión en el servidor
+// 2. Destruir sesión
+session_unset();
 session_destroy();
 
-// Eliminar cookies de usuario
-$cookieParams = [
-    'expires' => time() - 3600,
-    'path' => '/',
-    'domain' => 'otbchessresults.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Lax'
-];
+// 3. Eliminar la cookie de sesión
+setcookie(session_name(), '', time() - 3600, '/', 'otbchessresults.com', true, true);
 
-setcookie("google_id", "", $cookieParams);
-setcookie("nombre", "", $cookieParams);
-setcookie("email", "", $cookieParams);
+// 4. (Opcional) Eliminar cookies de usuario si se usan
+if (isset($_COOKIE['google_id'])) {
+    setcookie("google_id", "", time() - 3600, "/", "otbchessresults.com", true, true);
+}
+if (isset($_COOKIE['nombre'])) {
+    setcookie("nombre", "", time() - 3600, "/", "otbchessresults.com", true, true);
+}
+if (isset($_COOKIE['email'])) {
+    setcookie("email", "", time() - 3600, "/", "otbchessresults.com", true, true);
+}
 
-// Redirección segura a login
+// 5. Regenerar la sesión para prevenir reutilización de ID
+session_regenerate_id(true);
+
+// 6. Redirigir al login
 header("Location: login.php");
 exit();

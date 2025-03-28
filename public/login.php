@@ -1,17 +1,12 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php'; // Cargar dependencias
-require_once __DIR__ . '/database/connection.php';
-include __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-use Google\Client as Google_Client;
+use Dotenv\Dotenv;
+use Google_Client;
 
 // Cargar variables de entorno
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..'); // Carga el .env desde el nivel superior
+$dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-
-// variables de entorno están cargadas correctamente
-// var_dump($_ENV['GOOGLE_CLIENT_ID'], $_ENV['GOOGLE_CLIENT_SECRET']);
 
 session_set_cookie_params([
     'lifetime' => 3600,
@@ -26,7 +21,7 @@ session_start();
 
 // Verificar si ya está autenticado
 if (isset($_SESSION['usuario'])) {
-    header('Location: /dashboard.php');
+    header('Location: dashboard.php');
     exit();
 }
 
@@ -36,14 +31,15 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 try {
+    // Validar credenciales de Google
     if (empty($_ENV['GOOGLE_CLIENT_ID']) || empty($_ENV['GOOGLE_CLIENT_SECRET'])) {
-        throw new Exception('Credenciales de Google OAuth no configuradas.');
+        throw new Exception("Las credenciales de Google no están configuradas.");
     }
 
     $client = new Google_Client();
     $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
     $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-    $client->setRedirectUri('https://otbchessresults.com/callback.php');
+    $client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
     $client->addScope(['email', 'profile']);
     $client->setIncludeGrantedScopes(true);
     $client->setState($_SESSION['csrf_token']); // Protección CSRF
@@ -51,24 +47,6 @@ try {
     $authUrl = $client->createAuthUrl();
 } catch (Exception $e) {
     error_log('Error en login: ' . $e->getMessage());
-    header('Location: /error.php?msg=' . urlencode($e->getMessage()));
+    header('Location: error.php');
     exit();
 }
-
-// Mostrar el enlace de autenticación con Google
-?>
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-
-<body>
-    <h2>Iniciar sesión</h2>
-    <p><a href="<?= htmlspecialchars($authUrl) ?>">Iniciar sesión con Google</a></p>
-</body>
-
-</html>

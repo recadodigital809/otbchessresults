@@ -1,11 +1,27 @@
 <?php
+// Verificar autenticación y permisos
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login.php');
+    exit();
+}
 
-require_once __DIR__ . '/database/connection.php';
-include __DIR__ . '/templates/header.php';
+// Conexión a la base de datos
+require_once __DIR__ . "/database/connection.php";  // Asegúrate de que este archivo define `$pdo`
+
+// Generar token CSRF si no existe
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $mensaje = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validar token CSRF
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die("<div class='alert alert-danger'>Error de seguridad (CSRF inválido).</div>");
+    }
+
     // Obtener los datos del formulario
     $nombre = trim($_POST["nombre"]);
     $fecha_inicio = DateTime::createFromFormat('Y-m-d', $_POST["fecha_inicio"]);
@@ -13,21 +29,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$fecha_inicio) {
         $mensaje = "<div class='alert alert-danger'>Fecha de inicio inválida.</div>";
     } else {
-        $fecha_formateada = $fecha_inicio->format('Y-m-d'); // Definir una variable separada
+        $fecha_formateada = $fecha_inicio->format('Y-m-d');
         $tipo = trim($_POST["tipo"]);
         $sistema = trim($_POST["sistema"]);
         $dobleronda = isset($_POST["dobleronda"]) ? 1 : 0;
 
         try {
             // Uso de consultas preparadas con PDO
-            $sql = "INSERT INTO db_Torneos (nombre, fecha_inicio, tipo, sistema, dobleronda) VALUES (:nombre, :fecha_inicio, :tipo, :sistema, :dobleronda)";
+            $sql = "INSERT INTO db_Torneos (nombre, fecha_inicio, tipo, sistema, dobleronda) 
+                    VALUES (:nombre, :fecha_inicio, :tipo, :sistema, :dobleronda)";
             $stmt = $pdo->prepare($sql);
 
-            // Bind parameters
-            $stmt->bindParam(':nombre', $nombre);
-            $stmt->bindParam(':fecha_inicio', $fecha_formateada);
-            $stmt->bindParam(':tipo', $tipo);
-            $stmt->bindParam(':sistema', $sistema);
+            // Bind parameters con tipos explícitos
+            $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_inicio', $fecha_formateada, PDO::PARAM_STR);
+            $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR);
+            $stmt->bindParam(':sistema', $sistema, PDO::PARAM_STR);
             $stmt->bindParam(':dobleronda', $dobleronda, PDO::PARAM_INT);
 
             // Ejecutar la consulta
@@ -37,21 +54,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mensaje = "<div class='alert alert-danger'>Error: No se pudo agregar el torneo.</div>";
             }
         } catch (PDOException $e) {
-            // Manejo de errores de base de datos
-            $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";
+            $mensaje = "<div class='alert alert-danger'>Error en la base de datos: " . htmlspecialchars($e->getMessage()) . "</div>";
         }
     }
 }
-
 ?>
 
 <div class="container mt-5">
     <h2 class="text-center">Agregar Nuevo Torneo</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <?= $mensaje; ?>
+            <?= htmlspecialchars($mensaje); ?>
             <div class="card shadow-sm p-4">
                 <form method="post">
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+
                     <div class="mb-3">
                         <label class="form-label">Nombre del Torneo</label>
                         <input type="text" name="nombre" class="form-control" required>
@@ -63,8 +81,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="mb-3">
                         <label class="form-label">Tipo de Torneo</label>
                         <select name="tipo" class="form-select" required>
-                            <option value="online">Presencial</option>
-                            <!-- <option value="presencial">Online</option> -->
+                            <option value="presencial">Presencial</option>
+                            <option value="online">Online</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -85,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-trophy-fill me-2"></i>Crear Torneo
+                            <i class="bi bi-trophy-fill me-2"></i> Crear Torneo
                         </button>
                     </div>
                 </form>
@@ -93,6 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -105,4 +124,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
     });
 </script>
+
 <?php include __DIR__ . '/templates/footer.php'; ?>
