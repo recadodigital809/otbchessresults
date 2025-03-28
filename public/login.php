@@ -1,52 +1,36 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/database/connection.php';
 
-use Dotenv\Dotenv;
-use Google_Client;
 
-// Cargar variables de entorno
-$dotenv = Dotenv::createImmutable(__DIR__);
+// Cargar desde la raíz del proyecto
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-session_set_cookie_params([
-    'lifetime' => 3600,
-    'path' => '/',
-    'domain' => 'otbchessresults.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
 
-session_start();
+$client = new Google\Client();
+$client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+$client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+$client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
+$client->addScope('email');
+$client->addScope('profile');
 
-// Verificar si ya está autenticado
-if (isset($_SESSION['usuario'])) {
-    header('Location: /dashboard.php');
-    exit();
+if (isset($_GET['code'])) {
+    header('Location: google_auth_callback.php?code=' . $_GET['code']);
+    exit;
 }
 
-// Generar token CSRF si no existe
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+// Mostrar formulario de login o botón de Google
+?>
+<!DOCTYPE html>
+<html>
 
-try {
-    // Validar credenciales de Google
-    if (empty($_ENV['GOOGLE_CLIENT_ID']) || empty($_ENV['GOOGLE_CLIENT_SECRET'])) {
-        throw new Exception("Las credenciales de Google no están configuradas.");
-    }
+<head>
+    <title>Login</title>
+</head>
 
-    $client = new Google_Client();
-    $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
-    $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-    $client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
-    $client->addScope(['email', 'profile']);
-    $client->setIncludeGrantedScopes(true);
-    $client->setState($_SESSION['csrf_token']); // Protección CSRF
+<body>
+    <a href="<?= $client->createAuthUrl() ?>">Login with Google</a>
+</body>
 
-    $authUrl = $client->createAuthUrl();
-} catch (Exception $e) {
-    error_log('Error en login: ' . $e->getMessage());
-    header('Location: /error.php');
-    exit();
-}
+</html>
