@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Validación de entrada estricta
-        $nombre = filter_input(INPUT_POST, "nombre", FILTER_SANITIZE_STRING);
+        $nombre = filter_input(INPUT_POST, "nombre", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $fecha_inicio = filter_input(INPUT_POST, "fecha_inicio", FILTER_SANITIZE_STRING);
         $tipo = filter_input(INPUT_POST, "tipo", FILTER_SANITIZE_STRING);
         $sistema = filter_input(INPUT_POST, "sistema", FILTER_SANITIZE_STRING);
@@ -82,27 +82,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $tipo,
                 $sistema,
                 $dobleronda,
-                $_SESSION['usuario']['id']
+                $_SESSION['user_id'] // Corregido aquí
             ]);
 
             $pdo->commit();
 
             // Redirección para evitar reenvío de formulario
             $_SESSION['exito'] = "Torneo creado exitosamente";
-            header("Location: dashboard.php");
+            header("Location: agregar_jugadores_torneo.php");
             exit();
         } catch (PDOException $e) {
             $pdo->rollBack();
             throw new Exception("Error al guardar en base de datos: " . $e->getMessage());
         }
     } catch (Exception $e) {
-        error_log("Error en nuevo_torneo: " . $e->getMessage() . " - Usuario: " . $_SESSION['usuario']['id']);
+        error_log("Error en nuevo_torneo: " . $e->getMessage() . " - Usuario: " . $_SESSION['user_id']);
         $mensaje = "<div class='alert alert-danger'>" . htmlspecialchars($e->getMessage()) . "</div>";
     }
 }
 
 // Incluir vista
-include __DIR__ . '/templates/footer.php.php';
+include __DIR__ . '/templates/footer.php';
 ?>
 
 <div class="container mt-5">
@@ -146,7 +146,7 @@ include __DIR__ . '/templates/footer.php.php';
                                 <select class="form-select" name="tipo" id="tipo" required>
                                     <option value="">Seleccionar...</option>
                                     <option value="presencial">Presencial</option>
-                                    <option value="online">Online</option>
+                                    <!-- <option value="online">Online</option> -->
                                 </select>
                             </div>
 
@@ -214,5 +214,3 @@ include __DIR__ . '/templates/footer.php.php';
         });
     });
 </script>
-
-<?php include __DIR__ . '/templates/footer.php'; ?>
