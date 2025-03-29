@@ -13,7 +13,7 @@ if (isset($_SESSION['user_id'])) {
     try {
         $db = getDBConnection();
         $stmt = $db->prepare("
-            UPDATE db_usuarios 
+            UPDATE db_Usuarios 
             SET remember_token = NULL, 
                 token_expiry = NULL 
             WHERE id = :user_id

@@ -20,24 +20,26 @@ if (isset($_GET['code'])) {
         $google_account = $google_oauth->userinfo->get();
 
         // Verificar o crear usuario
-        $stmt = $pdo->prepare("SELECT * FROM db_usuarios WHERE google_id = ? OR email = ?");
+        $stmt = $pdo->prepare("SELECT * FROM db_Usuarios WHERE google_id = ? OR email = ?");
         $stmt->execute([$google_account->id, $google_account->email]);
         $user = $stmt->fetch();
 
         if (!$user) {
             // Crear nuevo usuario
-            $stmt = $pdo->prepare("INSERT INTO db_usuarios (google_id, nombre, email) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO db_Usuarios 
+                (google_id, nombre, email, estatus, created_at, updated_at) 
+                VALUES (:google_id, :nombre, :email, 1, NOW(), NOW())");
             $stmt->execute([
-                $google_account->id,
-                $google_account->name,
-                $google_account->email
+                ':google_id' => $google_account->getId(),
+                ':nombre' => $google_account->getName(),
+                ':email' => $google_account->getEmail()
             ]);
             $user_id = $pdo->lastInsertId();
         } else {
             $user_id = $user['id'];
             // Actualizar google_id si es necesario
             if (empty($user['google_id'])) {
-                $stmt = $pdo->prepare("UPDATE db_usuarios SET google_id = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE db_Usuarios SET google_id = ? WHERE id = ?");
                 $stmt->execute([$google_account->id, $user_id]);
             }
         }
@@ -58,7 +60,7 @@ if (isset($_GET['code'])) {
             true
         );
 
-        header('Location: /dashboard.php');
+        header('Location: dashboard.php');
         exit;
     } catch (Exception $e) {
         error_log('Google Auth Error: ' . $e->getMessage());

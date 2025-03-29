@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/database/connection.php";
-// include __DIR__ . '/templates/header.php';
+include __DIR__ . '/templates/header.php';
 
 // Verificar autenticación Google
 session_start();
@@ -41,10 +41,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Validar fecha futura
         $fecha_obj = DateTime::createFromFormat('Y-m-d', $fecha_inicio);
         $fecha_actual = new DateTime();
-        if (!$fecha_obj || $fecha_obj < $fecha_actual) {
+        $fecha_actual->setTime(0, 0, 0); // Eliminar la parte de la hora
+
+        if (!$fecha_obj || $fecha_obj->format('Y-m-d') < $fecha_actual->format('Y-m-d')) {
             throw new Exception("Fecha de inicio inválida o anterior a hoy");
         }
+
         $fecha_formateada = $fecha_obj->format('Y-m-d');
+
 
         // Validar valores permitidos
         $tipos_permitidos = ['presencial'];
@@ -68,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         try {
             $sql = "INSERT INTO db_Torneos 
-                    (nombre, fecha_inicio, tipo, sistema, dobleronda, creador_id) 
+                    (nombre, fecha_inicio, tipo, sistema, dobleronda, created_id) 
                     VALUES (?, ?, ?, ?, ?, ?)";
 
             $stmt = $pdo->prepare($sql);
@@ -85,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirección para evitar reenvío de formulario
             $_SESSION['exito'] = "Torneo creado exitosamente";
-            header("Location: /dashboard.php");
+            header("Location: dashboard.php");
             exit();
         } catch (PDOException $e) {
             $pdo->rollBack();
@@ -98,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Incluir vista
-include __DIR__ . '/templates/header.php';
+include __DIR__ . '/templates/footer.php.php';
 ?>
 
 <div class="container mt-5">

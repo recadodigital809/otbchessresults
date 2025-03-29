@@ -12,10 +12,10 @@ if (isset($_COOKIE['remember_token'])) {
         $db = getDBConnection();
         $token = $_COOKIE['remember_token'];
 
-        // Consulta actualizada para tu estructura de db_usuarios
+        // Consulta actualizada para tu estructura de db_Usuarios
         $stmt = $db->prepare("
             SELECT id, google_id, nombre, email 
-            FROM db_usuarios 
+            FROM db_Usuarios 
             WHERE remember_token = :token 
             AND token_expiry > NOW()
         ");
@@ -40,7 +40,7 @@ if (isset($_COOKIE['remember_token'])) {
             $expiry = date('Y-m-d H:i:s', strtotime('+30 days'));
 
             $updateStmt = $db->prepare("
-                UPDATE db_usuarios 
+                UPDATE db_Usuarios 
                 SET remember_token = :new_token, 
                     token_expiry = :expiry 
                 WHERE id = :user_id
