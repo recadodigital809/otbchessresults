@@ -156,12 +156,15 @@ $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
         // Iniciar torneo
         $("#iniciar_torneo").click(function() {
             let torneo_id = $("#torneo_id").val();
+            // Deshabilitar el botón para evitar múltiples clics
+            $("#iniciar_torneo").prop('disabled', true);
             $.post("procesar_torneo.php", {
                 action: "iniciar_torneo",
                 torneo_id: torneo_id
             }, function(response) {
-                alert(response);
+                // alert(response);
                 cargarJugadores(torneo_id); // Recargar solo la tabla en lugar de refrescar la página
+                $("#iniciar_torneo").prop('disabled', true);
             });
         });
     });
