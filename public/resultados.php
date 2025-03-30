@@ -31,6 +31,24 @@ $resultados = $stmt_resultados->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados de Torneos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+    </style>
 </head>
 
 <body>
@@ -72,8 +90,6 @@ $resultados = $stmt_resultados->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
     </div>
+    <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
-
 </html>
-<?php
-include __DIR__ . '/templates/footer.php';

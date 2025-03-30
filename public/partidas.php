@@ -58,6 +58,22 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
         .partida-card {
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -314,7 +330,7 @@ try {
             });
         });
     </script>
+  
     <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
-
 </html>

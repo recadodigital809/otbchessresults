@@ -3,7 +3,8 @@ session_start();
 
 // Verificar si ya está autenticado
 if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
+    // header('Location: dashboard.php');
+    header('Location: google_auth_callback.php');
     exit;
 }
 
@@ -22,7 +23,7 @@ try {
 
 // Configurar cliente Google
 $client = new Google\Client();
-$client->setApplicationName('Tu Aplicación');
+$client->setApplicationName('OTBchessresults');
 $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
 $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
 $client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);

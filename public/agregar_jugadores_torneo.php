@@ -15,7 +15,33 @@ if (empty($_SESSION['user_id'])) {
 $sqlTorneos = "SELECT id, nombre, fecha_inicio, sistema FROM db_Torneos WHERE estado = 'creado' ORDER BY fecha_inicio, nombre";
 $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
 ?>
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
 <div class="container mt-5">
     <h2 class="text-center">Gestión de Torneo</h2>
 
@@ -74,7 +100,6 @@ $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
     </div>
 </div>
 
-<?php include __DIR__ . '/templates/footer.php'; ?>
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -169,3 +194,6 @@ $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
         });
     });
 </script>
+<?php include __DIR__ . '/templates/footer.php'; ?>
+</body>
+</html>

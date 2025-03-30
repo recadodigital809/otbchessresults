@@ -5,7 +5,33 @@ require_once __DIR__ . '/templates/header.php';
 
 
 ?>
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
 <div class="container mt-5 text-center">
     <h1>Welcome to Over The Board Chess Results</h1>
     <p class="lead">Manage players, tournaments and matches easily.</p>
@@ -15,5 +41,6 @@ require_once __DIR__ . '/templates/header.php';
         <a href="agregar_jugadores_torneo.php" class="btn btn-success btn-sm">Add Chess Player</a>
     </div>
 </div>
-
 <?php include __DIR__ . '/templates/footer.php'; ?>
+</body>
+</html>

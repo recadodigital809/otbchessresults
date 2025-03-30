@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Validar valores permitidos
         $tipos_permitidos = ['presencial'];
-        $sistemas_permitidos = ['round robin', 'sistema suizo', 'eliminación simple', 'eliminación doble'];
+        $sistemas_permitidos = ['round robin', 'sistema suizo', 'arena','eliminación simple', 'eliminación doble'];
 
         if (!in_array($tipo, $tipos_permitidos)) {
             throw new Exception("Tipo de torneo no válido");
@@ -100,11 +100,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mensaje = "<div class='alert alert-danger'>" . htmlspecialchars($e->getMessage()) . "</div>";
     }
 }
-
-// Incluir vista
-include __DIR__ . '/templates/footer.php';
 ?>
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
 <div class="container mt-5">
     <h2 class="text-center mb-4">Crear Nuevo Torneo</h2>
 
@@ -157,6 +180,7 @@ include __DIR__ . '/templates/footer.php';
                                     <option value="">Seleccionar...</option>
                                     <option value="round robin">Round Robin</option>
                                     <option value="sistema suizo">Sistema Suizo</option>
+                                    <option value="arena">Sistema Suizo</option>
                                     <option value="eliminación simple">Eliminación Simple</option>
                                     <option value="eliminación doble">Eliminación Doble</option>
                                 </select>
@@ -214,3 +238,6 @@ include __DIR__ . '/templates/footer.php';
         });
     });
 </script>
+<?php include __DIR__ . '/templates/footer.php'; ?>
+</body>
+</html>
