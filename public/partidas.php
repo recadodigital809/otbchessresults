@@ -271,14 +271,14 @@ try {
                         try {
                             const serverResponse = JSON.parse(jqXHR.responseText);
                             if (serverResponse.error) errorMessage = serverResponse.error;
-                        } catch (e) {}
+                        } catch (e) {
+                            errorMessage = 'Error en el formato de respuesta del servidor';
+                        }
 
                         $('#mensaje-ajax').html(`<div class="alert alert-danger">${errorMessage}</div>`);
                         $button.html('<i class="bi bi-x-circle"></i> Error').prop('disabled', false);
-                    },
-                    complete: function() {
-                        $form.removeClass('saving');
                     }
+
                 });
             });
         });

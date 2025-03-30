@@ -1,17 +1,16 @@
+<!-- procesar_resultado.php -->
 <?php
 
 // Limpiar buffer de salida
 ob_start();
 
-include 'config.php';
+require_once __DIR__ . "/database/connection.php";
 
 header('Content-Type: application/json');
 
 try {
-    // Verificar si hay errores de conexión
-    if ($conn->connect_error) {
-        throw new Exception("Error de conexión a la base de datos: " . $conn->connect_error);
-    }
+    // La conexión ya es manejada por PDO, no es necesario verificarla manualmente
+    // Si la conexión falla, PDO lanzará una excepción automáticamente
 
     // Obtener y validar parámetros
     $partida_id = filter_input(INPUT_POST, 'partida_id', FILTER_VALIDATE_INT);
@@ -29,16 +28,19 @@ try {
         throw new Exception("Resultado no válido");
     }
 
-    // Ejecutar consulta
-    $stmt = $conn->prepare("UPDATE db_Partidas SET resultado = ? WHERE id = ? AND torneo_id = ?");
+    // Ejecutar consulta (PDO)
+    $stmt = $pdo->prepare("UPDATE db_Partidas SET resultado = :resultado WHERE id = :partida_id AND torneo_id = :torneo_id");
     if (!$stmt) {
-        throw new Exception("Error en preparación de consulta: " . $conn->error);
+        throw new Exception("Error en preparación de consulta: " . $pdo->errorInfo()[2]);
     }
 
-    $stmt->bind_param("sii", $resultado, $partida_id, $torneo_id);
+    // Usar bindValue para PDO
+    $stmt->bindValue(':resultado', $resultado, PDO::PARAM_STR);
+    $stmt->bindValue(':partida_id', $partida_id, PDO::PARAM_INT);
+    $stmt->bindValue(':torneo_id', $torneo_id, PDO::PARAM_INT);
 
     if (!$stmt->execute()) {
-        throw new Exception("Error ejecutando consulta: " . $stmt->error);
+        throw new Exception("Error ejecutando consulta: " . implode(", ", $stmt->errorInfo()));
     }
 
     echo json_encode(['success' => true]);
@@ -50,6 +52,6 @@ try {
         'error' => $e->getMessage()
     ]);
 }
+
 // Limpiar cualquier salida previa
 ob_end_clean();
-echo json_encode(['success' => true]);
