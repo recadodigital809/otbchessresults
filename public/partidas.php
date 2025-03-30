@@ -2,6 +2,13 @@
 require_once __DIR__ . "/database/connection.php";
 include __DIR__ . '/templates/header.php';
 
+// Verificar autenticación Google
+session_start();
+if (empty($_SESSION['user_id'])) {
+    header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+    exit;
+}
+
 // Obtener parámetros
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 // Validar torneo_id
