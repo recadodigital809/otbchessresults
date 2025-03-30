@@ -1,4 +1,3 @@
-<!-- partidas.php -->
 <?php
 require_once __DIR__ . "/database/connection.php";
 include __DIR__ . '/templates/header.php';
@@ -253,7 +252,7 @@ try {
                                 $button.html('<i class="bi bi-save"></i> Guardado!').prop('disabled', false).addClass('bg-info');
                             }, 1000);
                         } else {
-                            const errorMsg = response && response.error ? response.error : 'Error desconocido';
+                            const errorMsg = response?.error ?? 'Error desconocido';
                             console.error('Error en la respuesta:', response);
                             $('#mensaje-ajax').html(`<div class="alert alert-danger">${errorMsg}</div>`);
                             $button.html('<i class="bi bi-x-circle"></i> Error').prop('disabled', false);
@@ -267,22 +266,25 @@ try {
                             errorThrown: errorThrown
                         });
 
-                        let errorMessage = 'Error de conexión';
+                        let errorMessage = 'Error de conexión en la respuesta del servidor';
                         try {
                             const serverResponse = JSON.parse(jqXHR.responseText);
                             if (serverResponse.error) errorMessage = serverResponse.error;
                         } catch (e) {
-                            errorMessage = 'Error en el formato de respuesta del servidor';
+                            console.error('Error al analizar la respuesta JSON', e);
                         }
 
                         $('#mensaje-ajax').html(`<div class="alert alert-danger">${errorMessage}</div>`);
                         $button.html('<i class="bi bi-x-circle"></i> Error').prop('disabled', false);
+                    },
+                    complete: function() {
+                        $form.removeClass('saving');
                     }
-
                 });
             });
         });
     </script>
+
     <script>
         $(document).ready(function() {
             $("#btn-finalizar").click(function(e) {
@@ -312,8 +314,7 @@ try {
             });
         });
     </script>
-
+    <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
-<?php include __DIR__ . '/templates/footer.php'; ?>
 
 </html>

@@ -1,12 +1,7 @@
-<!-- procesar_resultado.php -->
 <?php
-
-// Limpiar buffer de salida
-ob_start();
+header('Content-Type: application/json'); // ¡Primera línea!
 
 require_once __DIR__ . "/database/connection.php";
-
-header('Content-Type: application/json');
 
 try {
     // La conexión ya es manejada por PDO, no es necesario verificarla manualmente
@@ -43,15 +38,10 @@ try {
         throw new Exception("Error ejecutando consulta: " . implode(", ", $stmt->errorInfo()));
     }
 
+    // Solo echo esta respuesta cuando todo ha sido exitoso
     echo json_encode(['success' => true]);
 } catch (Exception $e) {
+    // Si ocurre un error, responde con código 500 y mensaje de error
     http_response_code(500);
-    error_log($e->getMessage()); // Log en el servidor
-    echo json_encode([
-        'success' => false,
-        'error' => $e->getMessage()
-    ]);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
-
-// Limpiar cualquier salida previa
-ob_end_clean();
