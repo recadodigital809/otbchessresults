@@ -60,8 +60,12 @@ if (isset($_GET['code'])) {
             true
         );
 
-        header('Location: dashboard.php');
-        exit;
+  // Recupera la URL original
+$redirect_url = $_SESSION['redirect_after_login'] ?? '/';
+unset($_SESSION['redirect_after_login']); // Limpia la variable de sesión
+
+header("Location: $redirect_url");
+exit;
     } catch (Exception $e) {
         error_log('Google Auth Error: ' . $e->getMessage());
         header('Location: login.php?error=google_auth_failed');

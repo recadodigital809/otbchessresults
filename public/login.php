@@ -31,6 +31,11 @@ $client->addScope(['email', 'profile']);
 $client->setAccessType('offline');
 $client->setPrompt('select_account consent');
 
+// Guarda la URL de referencia si existe
+if (!empty($_GET['redirect'])) {
+    $_SESSION['redirect_after_login'] = $_GET['redirect'];
+}
+
 // Manejar código de autorización
 if (isset($_GET['code'])) {
     try {
