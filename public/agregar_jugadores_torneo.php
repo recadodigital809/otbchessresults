@@ -4,6 +4,7 @@
 require_once __DIR__ . "/database/connection.php";
 include __DIR__ . '/templates/header.php';
 
+
 // Verificar autenticación Google
 session_start();
 if (empty($_SESSION['user_id'])) {
@@ -12,15 +13,21 @@ if (empty($_SESSION['user_id'])) {
 }
 
 // Obtener torneos en estado "creado"
-$sqlTorneos = "SELECT id, nombre, fecha_inicio, sistema FROM db_Torneos WHERE estado = 'creado' ORDER BY fecha_inicio, nombre";
-$stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
+$sqlTorneos = "SELECT id, nombre, fecha_inicio, sistema 
+               FROM db_Torneos 
+               WHERE estado = 'creado' 
+               AND created_id = :user_id 
+               ORDER BY fecha_inicio, nombre";
+$stmt = $pdo->prepare($sqlTorneos);
+$stmt->execute(['user_id' => $_SESSION['user_id']]);
+$torneos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
+    <title>Agregar Jugadores al Torneo</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
@@ -50,11 +57,11 @@ $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
         <label class="form-label">Seleccionar Torneo</label>
         <select id="torneo_id" class="form-control">
             <option value="">-- Seleccione un torneo --</option>
-            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) : ?>
+            <?php foreach ($torneos as $row): ?>
                 <option value="<?= htmlspecialchars($row['id']); ?>">
                     <?= htmlspecialchars($row['nombre']) . " (" . htmlspecialchars($row['sistema']) . ")"; ?>
                 </option>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -92,7 +99,7 @@ $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
         </div>
 
         <!-- Botón para iniciar el torneo -->
-        <div class="mt-4 text-center">
+        <div class="mt-4 text-center" style="margin-bottom: 20px;">
             <button id="iniciar_torneo" class="btn btn-primary" disabled>
                 Iniciar Torneo
             </button>
@@ -190,6 +197,9 @@ $stmt = $pdo->query($sqlTorneos); // Ejecutar la consulta
                 // alert(response);
                 cargarJugadores(torneo_id); // Recargar solo la tabla en lugar de refrescar la página
                 $("#iniciar_torneo").prop('disabled', true);
+                
+                // Redirigir a partidas.php
+                 window.location.href = "partidas.php";  // Cambiar la URL a la página de partidas
             });
         });
     });

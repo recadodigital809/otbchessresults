@@ -9,10 +9,15 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
-// Obtener la lista de torneos para el filtro
-$query_torneos = "SELECT id as torneo_id, nombre as torneo FROM db_Torneos where estado <>'creado' ORDER BY fecha_inicio desc, nombre asc";
+
+// Obtener la lista de torneos creados por el usuario autenticado
+$query_torneos = "SELECT id as torneo_id, nombre as torneo 
+                  FROM db_Torneos 
+                  WHERE estado <> 'creado' 
+                  AND created_id = :user_id 
+                  ORDER BY fecha_inicio DESC, nombre ASC";
 $stmt_torneos = $pdo->prepare($query_torneos);
-$stmt_torneos->execute();
+$stmt_torneos->execute(['user_id' => $_SESSION['user_id']]);
 $torneos = $stmt_torneos->fetchAll(PDO::FETCH_ASSOC);
 
 $torneo_id = $_GET['torneo_id'] ?? '';
