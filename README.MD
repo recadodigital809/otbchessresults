@@ -25,3 +25,12 @@ docker-compose up -d --build
 # Restart
 docker-compose down -v && docker-compose up -d --build
 
+# Git Command
+git add .
+
+git commit -m "Add new feature"
+
+git push
+
+git push origin HEAD:master
+
