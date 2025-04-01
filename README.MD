@@ -34,3 +34,11 @@ git push
 
 git push origin HEAD:master
 
+ ## Usar GitHub Copilot
+Autocompletado en tiempo real: Escribe código en un archivo y Copilot sugerirá líneas o bloques de código.
+
+Aceptar sugerencias: Presiona Tab para aceptar la sugerencia.
+
+Ver otras opciones: Presiona Ctrl + Enter (o Cmd + Enter en macOS) para ver más opciones de código.
+
+Forzar una sugerencia: Escribe un comentario como // Crear una función que sume dos números y espera la sugerencia de Copilot.
