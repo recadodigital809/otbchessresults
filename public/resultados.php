@@ -9,31 +9,16 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
-
-// Obtener la lista de torneos creados por el usuario autenticado
-$query_torneos = "SELECT id as torneo_id, nombre as torneo 
-                  FROM db_Torneos 
-                  WHERE estado <> 'creado' 
-                  AND created_id = :user_id 
-                  ORDER BY fecha_inicio DESC, nombre ASC";
-$stmt_torneos = $pdo->prepare($query_torneos);
-$stmt_torneos->execute(['user_id' => $_SESSION['user_id']]);
-$torneos = $stmt_torneos->fetchAll(PDO::FETCH_ASSOC);
-
 $torneo_id = $_GET['torneo_id'] ?? '';
-
-// Obtener los resultados filtrados
-$query_resultados = "SELECT * FROM vw_PuntosTorneos";
-$params = [];
+$resultados = [];
 
 if (!empty($torneo_id)) {
-    $query_resultados .= " WHERE torneo_id = :torneo_id";
-    $params[':torneo_id'] = $torneo_id;
+    // Obtener los resultados solo si hay torneo seleccionado
+    $query_resultados = "SELECT * FROM vw_PuntosTorneos WHERE torneo_id = :torneo_id";
+    $stmt_resultados = $pdo->prepare($query_resultados);
+    $stmt_resultados->execute([':torneo_id' => $torneo_id]);
+    $resultados = $stmt_resultados->fetchAll(PDO::FETCH_ASSOC);
 }
-
-$stmt_resultados = $pdo->prepare($query_resultados);
-$stmt_resultados->execute($params);
-$resultados = $stmt_resultados->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -60,24 +45,50 @@ $resultados = $stmt_resultados->fetchAll(PDO::FETCH_ASSOC);
             padding: 1rem;
             margin-top: auto;
         }
+        #tabla-resultados {
+            display: <?= empty($torneo_id) ? 'none' : 'table' ?>;
+        }
     </style>
 </head>
 
 <body>
     <div class="container mt-4">
         <h2 class="mb-4">Resultados de Torneos</h2>
-        <form method="GET" class="mb-3">
-            <label for="torneo_id" class="form-label">Selecciona un Torneo:</label>
-            <select name="torneo_id" id="torneo_id" class="form-select" onchange="this.form.submit()">
-                <option value="">Todos</option>
-                <?php foreach ($torneos as $torneo): ?>
-                    <option value="<?= $torneo['torneo_id'] ?>" <?= ($torneo_id == $torneo['torneo_id']) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($torneo['torneo']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </form>
-        <table class="table table-bordered table-striped">
+        <!-- Selector de Torneo -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3" id="form-torneo">
+                    <div class="col-md-8">
+                        <select name="torneo_id" class="form-select" required>
+                            <option value="">-- Seleccionar Torneo Activo --</option>
+                            <?php
+                            $query_torneos = "SELECT id, nombre FROM db_Torneos WHERE estado <> 'creado'";
+                            if (!empty($_SESSION['user_id'])) {
+                                $query_torneos .= " AND created_id = :user_id";
+                            }
+                            $query_torneos .= " ORDER BY fecha_inicio DESC, nombre ASC";
+
+                            $stmt = $pdo->prepare($query_torneos);
+                            $stmt->execute([':user_id' => $_SESSION['user_id'] ?? null]);
+                            while ($t = $stmt->fetch(PDO::FETCH_ASSOC)):
+                            ?>
+                                <option value="<?= $t['id'] ?>" <?= $t['id'] == $torneo_id ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($t['nombre']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100" id="btn-ver-resultados">
+                            <i class="bi bi-arrow-clockwise"></i> Ver Resultados
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de Resultados (inicialmente oculta) -->
+        <table class="table table-bordered table-striped" id="tabla-resultados">
             <thead>
                 <tr>
                     <th>Jugador</th>
@@ -102,6 +113,28 @@ $resultados = $stmt_resultados->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("form-torneo");
+            const selectTorneo = form.querySelector("select[name='torneo_id']");
+            const tablaResultados = document.getElementById("tabla-resultados");
+
+            form.addEventListener("submit", function (e) {
+                if (selectTorneo.value === "") {
+                    alert("Por favor, seleccione un torneo antes de ver los resultados.");
+                    e.preventDefault(); // Evita que el formulario se envíe
+                }
+            });
+
+            if (selectTorneo.value !== "") {
+                tablaResultados.style.display = "table";
+            }
+        });
+    </script>
+
     <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
 </html>
