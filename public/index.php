@@ -3,7 +3,7 @@
 
 require_once __DIR__ . '/templates/header.php';
 
-
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -33,6 +33,7 @@ require_once __DIR__ . '/templates/header.php';
 </head>
 <body>
 <div class="container mt-5 text-center">
+
     <h1>Welcome to Over The Board Chess Results</h1>
     <p class="lead">Manage players, tournaments and matches easily.</p>
     <img src="img\shutterstock_22825027.jpg" alt="Chess Piece" class="img-fluid my-3" style="width: 50%;">

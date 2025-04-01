@@ -180,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <option value="">Seleccionar...</option>
                                     <option value="round robin">Round Robin</option>
                                     <option value="sistema suizo">Sistema Suizo</option>
-                                    <option value="arena">Sistema Suizo</option>
+                                    <option value="arena">Arena</option>
                                     <option value="eliminación simple">Eliminación Simple</option>
                                     <option value="eliminación doble">Eliminación Doble</option>
                                 </select>
