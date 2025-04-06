@@ -72,6 +72,7 @@ try {
 
         table {
             width: 80%;
+            border-collapse: collapse;
             margin: 20px auto;
             border-collapse: collapse;
             background: white;
@@ -80,9 +81,9 @@ try {
 
         th,
         td {
-            padding: 10px;
+            padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
         }
 
         th {
@@ -98,36 +99,44 @@ try {
         tr:hover {
             background-color: #f1f1f1;
         }
+        @media (max-width: 600px) {
+            table {
+                font-size: 14px;
+            }
+}
     </style>
 </head>
 
 <body>
-    <h1>Listado de Jugadores</h1>
+    <h1 style="padding-top:10px;">Listado de Jugadores</h1>
+    <div style="overflow-x:auto;">
     <table>
         <tr>
             <th><a href="?order_by=id&order_dir=asc">ID</a></th>
             <th><a href="?order_by=nombre&order_dir=asc">Nombre</a></th>
             <th><a href="?order_by=elo&order_dir=asc">ELO</a></th>
         </tr>
-        <?php if ($result->num_rows > 0): ?>
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row["id"]) ?></td>
-                    <td><?= htmlspecialchars($row["nombre"]) ?></td>
-                    <td><?= htmlspecialchars($row["elo"]) ?></td>
-
-                </tr>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="4" style="text-align: center;">No hay jugadores registrados</td>
-            </tr>
-        <?php endif; ?>
+<?php
+$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+if (count($rows) > 0):
+    foreach ($rows as $row):
+?>
+    <tr>
+        <td><?= htmlspecialchars($row["id"]) ?></td>
+        <td><?= htmlspecialchars($row["nombre"]) ?></td>
+        <td><?= htmlspecialchars($row["elo"]) ?></td>
+    </tr>
+<?php
+    endforeach;
+else:
+?>
+    <tr>
+        <td colspan="4" style="text-align: center;">No hay jugadores registrados</td>
+    </tr>
+<?php endif; ?>
     </table>
+</div>
+    <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
 
 </html>
-
-<?php $conn->close(); ?>
-
-<?php include __DIR__ . '/templates/header.php'; ?>

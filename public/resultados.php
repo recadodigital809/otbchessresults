@@ -25,19 +25,21 @@ if (!empty($torneo_id)) {
 
 <head>
     <meta charset="UTF-8">
+    <title>Resultado del Torneo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados de Torneos</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             display: flex;
             flex-direction: column;
         }
+
         .main-content {
             flex: 1;
         }
+
         footer {
             background-color: #343a40;
             color: white;
@@ -45,8 +47,17 @@ if (!empty($torneo_id)) {
             padding: 1rem;
             margin-top: auto;
         }
+
+        /* Mostrar u ocultar tabla según si hay torneo seleccionado */
         #tabla-resultados {
             display: <?= empty($torneo_id) ? 'none' : 'table' ?>;
+        }
+
+        /* Estilo responsivo para móviles */
+        @media (max-width: 600px) {
+            #tabla-resultados {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -86,43 +97,48 @@ if (!empty($torneo_id)) {
                 </form>
             </div>
         </div>
-
-        <!-- Tabla de Resultados (inicialmente oculta) -->
-        <table class="table table-bordered table-striped" id="tabla-resultados">
-            <thead>
-                <tr>
-                    <th>Jugador</th>
-                    <th>ELO</th>
-                    <th>Victorias</th>
-                    <th>Empates</th>
-                    <th>Derrotas</th>
-                    <th>Puntos</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($resultados as $row): ?>
+        <div class="table-responsive">
+            <!-- Tabla de Resultados (inicialmente oculta) -->
+            <table class="table table-bordered table-striped" id="tabla-resultados">
+                <thead class="table-dark">
                     <tr>
-                        <td><?= htmlspecialchars($row['jugador']) ?></td>
-                        <td><?= $row['elo'] ?></td>
-                        <td><?= $row['victorias'] ?></td>
-                        <td><?= $row['empates'] ?></td>
-                        <td><?= $row['derrotas'] ?></td>
-                        <td><?= $row['puntos'] ?></td>
+                        <th>Player</th>
+                        <th>ELO</th>
+                        <th>Win</th>
+                        <th>Tie</th>
+                        <th>Lose</th>
+                        <th>Points</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($resultados as $row): ?>
+                        <tr>
+                            <td>
+                                <a href="detalle_torneo.php?torneo_id=<?= urlencode($torneo_id) ?>&jugador_id=<?= urlencode($row['jugador_id']) ?>">
+                                    <?= htmlspecialchars($row['jugador']) ?>
+                                </a>
+                            </td>
+                            <td><?= $row['elo'] ?></td>
+                            <td><?= $row['victorias'] ?></td>
+                            <td><?= $row['empates'] ?></td>
+                            <td><?= $row['derrotas'] ?></td>
+                            <td><?= $row['puntos'] ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById("form-torneo");
             const selectTorneo = form.querySelector("select[name='torneo_id']");
             const tablaResultados = document.getElementById("tabla-resultados");
 
-            form.addEventListener("submit", function (e) {
+            form.addEventListener("submit", function(e) {
                 if (selectTorneo.value === "") {
                     alert("Por favor, seleccione un torneo antes de ver los resultados.");
                     e.preventDefault(); // Evita que el formulario se envíe
@@ -137,4 +153,5 @@ if (!empty($torneo_id)) {
 
     <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
+
 </html>

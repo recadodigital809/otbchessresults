@@ -36,29 +36,29 @@
                     <!-- Dropdown para Torneos -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownTorneos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Tournaments
+                            Torneos
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownTorneos">
-                            <li><a class="dropdown-item" href="nuevo_torneo.php">New Tournament</a></li>
-                            <li><a class="dropdown-item" href="agregar_jugadores_torneo.php">Add Chess Player</a></li>
-                            <li><a class="dropdown-item" href="partidas.php">Tournament Pairing</a></li>
+                            <li><a class="dropdown-item" href="nuevo_torneo.php">Nuevo Torneo</a></li>
+                            <li><a class="dropdown-item" href="agregar_jugadores_torneo.php">Agregar jugador</a></li>
+                            <li><a class="dropdown-item" href="partidas.php">Emparejamiento</a></li>
                         </ul>
                     </li>
 
                     <!-- Dropdown para Jugadores -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownJugadores" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Players
+                            jugadores
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownJugadores">
-                            <li><a class="dropdown-item" href="ingresar_jugadores.php">Add Chess Player</a></li>
+                            <li><a class="dropdown-item" href="ingresar_jugadores.php">Agregar jugador</a></li>
                             <!-- <li><a class="dropdown-item" href="profile.php">Perfil Jugador</a></li> -->
-                            <li><a class="dropdown-item" href="listado_jugadores.php">Player List</a></li>
+                            <li><a class="dropdown-item" href="listado_jugadores.php">Lista de jugadores</a></li>
                         </ul>
                     </li>
 
                     <li class="nav-item"><a class="nav-link" href="resultados.php">
-                            Tournaments Results</a></li>
+                            Resultados</a></li>
                 </ul>
             </div>
         </div>

@@ -327,7 +327,7 @@ try {
                     })
                     .done(function(response) {
                         console.log("Respuesta del servidor:", response);
-                        alert(response);
+                        alert("Torneo finalizado exitosamente.");
                         location.reload();
                     })
                     .fail(function(jqXHR, textStatus, errorThrown) {
