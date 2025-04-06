@@ -11,14 +11,17 @@ if (empty($_SESSION['user_id'])) {
 
 // Obtener parámetros
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
+
 // Validar torneo_id
 $torneo_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT) ?:
     filter_input(INPUT_POST, 'torneo_id', FILTER_VALIDATE_INT) ?: 0;
 
-
 // Obtener datos del torneo
 $torneo = [];
 $rondas = [];
+
+// Ronda activa, por ejemplo, Ronda 1
+$active_round = 1;
 
 try {
     $stmt = $pdo->prepare("SELECT * FROM db_Torneos WHERE id = :torneo_id");
@@ -65,15 +68,18 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             display: flex;
             flex-direction: column;
         }
+
         .main-content {
             flex: 1;
         }
+
         footer {
             background-color: #343a40;
             color: white;
@@ -81,6 +87,7 @@ try {
             padding: 1rem;
             margin-top: auto;
         }
+
         .partida-card {
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -153,6 +160,7 @@ try {
                         </div>
                         <div class="col-md-3">
                             <p class="mb-1"><strong>Rondas:</strong> <?= count($rondas) ?></p>
+                            <?php $next_round = count($rondas) / 2 + $active_round; ?>
                         </div>
                         <div class="col-md-3">
                             <button type="submit" id="btn-finalizar" class="btn btn-danger btn-sm">Finalizar Torneo</button>
@@ -165,11 +173,12 @@ try {
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <?php foreach ($rondas as $num_ronda => $partidas_ronda): ?>
-                            <button class="nav-link <?= $num_ronda == 1 ? 'active' : '' ?>"
+                            <button class="nav-link <?= $num_ronda == $active_round ? 'active' : '' ?>"
                                 data-bs-toggle="tab"
                                 data-bs-target="#ronda-<?= $num_ronda ?>"
                                 type="button">
                                 Ronda <?= $num_ronda ?>
+                                <?= ($num_ronda == $next_round) ? ' 🔁' : '' ?>
                             </button>
                         <?php endforeach; ?>
                     </div>
@@ -292,52 +301,18 @@ try {
                         let errorMessage = 'Error de conexión en la respuesta del servidor';
                         try {
                             const serverResponse = JSON.parse(jqXHR.responseText);
-                            if (serverResponse.error) errorMessage = serverResponse.error;
-                        } catch (e) {
-                            console.error('Error al analizar la respuesta JSON', e);
-                        }
+                            if (serverResponse.error) {
+                                errorMessage = serverResponse.error;
+                            }
+                        } catch (e) {}
 
                         $('#mensaje-ajax').html(`<div class="alert alert-danger">${errorMessage}</div>`);
                         $button.html('<i class="bi bi-x-circle"></i> Error').prop('disabled', false);
-                    },
-                    complete: function() {
-                        $form.removeClass('saving');
                     }
                 });
             });
         });
     </script>
-
-    <script>
-        $(document).ready(function() {
-            $("#btn-finalizar").click(function(e) {
-                e.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
-
-                // let torneo_id = $("#torneo_id").val(); // Asegurar que el ID está presente
-                let torneo_id = $("select[name='torneo_id']").val();
-
-                if (!torneo_id) {
-                    alert("Error: No se encontró el ID del torneo.");
-                    return;
-                }
-
-                $.post("finalizar_torneo.php", {
-                        action: "btn-finalizar",
-                        torneo_id: torneo_id
-                    })
-                    .done(function(response) {
-                        console.log("Respuesta del servidor:", response);
-                        alert("Torneo finalizado exitosamente.");
-                        location.reload();
-                    })
-                    .fail(function(jqXHR, textStatus, errorThrown) {
-                        console.error("Error en la solicitud:", textStatus, errorThrown);
-                        alert("Hubo un error al finalizar el torneo.");
-                    });
-            });
-        });
-    </script>
-  
-    <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
+
 </html>
