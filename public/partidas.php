@@ -21,7 +21,8 @@ $torneo = [];
 $rondas = [];
 
 // Ronda activa, por ejemplo, Ronda 1
-$active_round = 1;
+$active_round = $_SESSION['active_round'] ?? 1;
+// $active_round = 1;
 
 try {
     $stmt = $pdo->prepare("SELECT * FROM db_Torneos WHERE id = :torneo_id");
@@ -176,9 +177,10 @@ try {
                             <button class="nav-link <?= $num_ronda == $active_round ? 'active' : '' ?>"
                                 data-bs-toggle="tab"
                                 data-bs-target="#ronda-<?= $num_ronda ?>"
-                                type="button">
+                                type="button"
+                                data-round="<?= $num_ronda ?>">
                                 Ronda <?= $num_ronda ?>
-                                <?= ($num_ronda == $next_round) ? ' 🔁' : '' ?>
+
                             </button>
                         <?php endforeach; ?>
                     </div>
@@ -261,6 +263,18 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
+
+            // $(function() {
+            //     const initialActiveRound = <?= $active_round ?? 1 ?>;
+            //     const totalRounds = <?= count($rondas) ?>;
+            //     const nextRound = initialActiveRound + 1;
+
+            //     if (nextRound <= totalRounds) {
+            //         $(`#nav-tab .nav-link[data-round="${nextRound}"]`).append(' 🔁');
+            //     }
+            // });
+
+            // Para guadar el resultado de la partida
             $('.form-resultado').on('submit', function(e) {
                 e.preventDefault();
                 const $form = $(this);
@@ -311,8 +325,51 @@ try {
                     }
                 });
             });
+
+            // Para la ronda de la revancha
+            // Update the existing JavaScript code
+            // Para la ronda de la revancha
+            $('#nav-tab').on('click', '.nav-link', function() {
+                const selectedRound = parseInt($(this).data('round'));
+                const totalRounds = <?= count($rondas) ?>;
+                // const nextRound = selectedRound + (totalRounds / 2);
+                // const nextRound = selectedRound + (totalRounds / 2);
+
+                let nextRound;
+
+                if (selectedRound < totalRounds / 2) {
+                    nextRound = selectedRound + (totalRounds / 2);
+                } else if (selectedRound === totalRounds / 2) {
+                    nextRound = totalRounds;
+                } else if (selectedRound > totalRounds / 2) {
+                    nextRound = selectedRound - (totalRounds / 2);
+                }
+                // Limpiar todos los íconos existentes primero
+                $('#nav-tab .nav-link').each(function() {
+                    $(this).find('.revancha-icon').remove();
+                });
+
+                // Actualizar solo la pestaña correspondiente
+                $.post('actualizar_ronda.php', {
+                    active_round: selectedRound
+                }, function(response) {
+                    if (response.success) {
+                        // Actualizar UI
+
+                        $(`#nav-tab .nav-link[data-round="${nextRound}"]`)
+                            .append('<span class="revancha-icon"> 🔁</span>');
+
+                        // Actualizar clase activa
+                        $('#nav-tab .nav-link').removeClass('active');
+                        $(this).addClass('active');
+                    }
+                }.bind(this), 'json');
+            });
+
         });
     </script>
+
+
 </body>
 
 </html>

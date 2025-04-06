@@ -1,23 +1,24 @@
 <?php
-// Iniciar la sesión y verificar autenticación
 session_start();
-if (empty($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'error' => 'No autenticado']);
-    exit;
-}
+require_once __DIR__ . "/database/connection.php";
 
-// Obtener la ronda activa desde la solicitud
-$active_round = $_POST['active_round'] ?? null;
-if ($active_round === null) {
-    echo json_encode(['success' => false, 'error' => 'Ronda no válida']);
-    exit;
-}
+$response = ['success' => false, 'error' => ''];
 
-// Actualizar la ronda activa en la base de datos o en la sesión
 try {
-    $_SESSION['active_round'] = $active_round; // Asumimos que se guarda en sesión
-    // Si es necesario, realiza una actualización en la base de datos aquí
-    echo json_encode(['success' => true]);
+    if (empty($_SESSION['user_id'])) {
+        throw new Exception('Unauthorized');
+    }
+
+    $active_round = filter_input(INPUT_POST, 'active_round', FILTER_VALIDATE_INT);
+    if ($active_round === false || $active_round < 1) {
+        throw new Exception('Invalid round number');
+    }
+
+    $_SESSION['active_round'] = $active_round;
+    $response['success'] = true;
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    $response['error'] = $e->getMessage();
 }
+
+header('Content-Type: application/json');
+echo json_encode($response);
