@@ -4,9 +4,27 @@ include __DIR__ . '/templates/header.php';
 
 // Verificar autenticación Google
 session_start();
+// Autenticación por remember_token si no hay sesión activa
 if (empty($_SESSION['user_id'])) {
-    header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
-    exit;
+    if (!empty($_COOKIE['remember_token'])) {
+        $token = $_COOKIE['remember_token'];
+
+        $stmt = $pdo->prepare("SELECT id FROM db_Usuarios WHERE remember_token = ?");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+        } else {
+            // Token inválido → redirigir al login
+            header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+            exit;
+        }
+    } else {
+        // No hay sesión ni cookie → redirigir al login
+        header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+        exit;
+    }
 }
 
 $mensaje = "";
