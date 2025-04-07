@@ -73,17 +73,14 @@ if (!empty($torneo_id)) {
                         <select name="torneo_id" class="form-select" required>
                             <option value="">-- Seleccionar Torneo Activo --</option>
                             <?php
-                            $query_torneos = "SELECT id, nombre FROM db_Torneos WHERE estado <> 'creado'";
-                            if (!empty($_SESSION['user_id'])) {
-                                $query_torneos .= " AND created_id = :user_id";
-                            }
-                            $query_torneos .= " ORDER BY fecha_inicio DESC, nombre ASC";
+                            $query_torneos = "SELECT id, nombre FROM db_Torneos WHERE estado <> 'creado' ORDER BY fecha_inicio DESC, nombre ASC";
 
                             $stmt = $pdo->prepare($query_torneos);
-                            $stmt->execute([':user_id' => $_SESSION['user_id'] ?? null]);
+                            $stmt->execute(); // no se pasan parámetros
+
                             while ($t = $stmt->fetch(PDO::FETCH_ASSOC)):
                             ?>
-                                <option value="<?= $t['id'] ?>" <?= $t['id'] == $torneo_id ? 'selected' : '' ?>>
+                                <option value="<?= $t['id'] ?>" <?= $t['id'] == ($torneo_id ?? '') ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($t['nombre']) ?>
                                 </option>
                             <?php endwhile; ?>

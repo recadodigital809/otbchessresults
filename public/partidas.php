@@ -22,7 +22,7 @@ $rondas = [];
 
 // Ronda activa, por ejemplo, Ronda 1
 $active_round = $_SESSION['active_round'] ?? 1;
-// $active_round = 1;
+
 
 try {
     $stmt = $pdo->prepare("SELECT * FROM db_Torneos WHERE id = :torneo_id");
@@ -217,8 +217,8 @@ try {
                                                 <div class="row align-items-center">
                                                     <!-- Jugador Blancas -->
                                                     <div class="col-4 text-end pe-4">
-                                                        <div class="fw-bold text-primary"><?= htmlspecialchars($partida['blancas_nombre'] ?? 'Bye')  ?> - <?= htmlspecialchars($partida['blancas_lugar']) ?></div>
-                                                        <small class="text-muted">Blancas</small>
+                                                        <div class="fw-bold text-primary"><?= htmlspecialchars($partida['blancas_nombre'] ?? 'Bye')  ?> </div>
+                                                        <small class="text-muted"> <?= htmlspecialchars($partida['blancas_lugar']) ?></small>
                                                     </div>
 
                                                     <!-- Resultado -->
@@ -233,8 +233,8 @@ try {
 
                                                     <!-- Jugador Negras -->
                                                     <div class="col-4 text-start ps-4">
-                                                        <div class="fw-bold text-dark"><?= htmlspecialchars($partida['negras_nombre'] ?? 'Bye') ?> - <?= htmlspecialchars($partida['negras_lugar']) ?></div>
-                                                        <small class="text-muted">Negras</small>
+                                                        <div class="fw-bold text-dark"><?= htmlspecialchars($partida['negras_nombre'] ?? 'Bye') ?> </div>
+                                                        <small class="text-muted"> <?= htmlspecialchars($partida['negras_lugar']) ?></small>
                                                     </div>
                                                 </div>
 
@@ -264,15 +264,6 @@ try {
     <script>
         $(document).ready(function() {
 
-            // $(function() {
-            //     const initialActiveRound = <?= $active_round ?? 1 ?>;
-            //     const totalRounds = <?= count($rondas) ?>;
-            //     const nextRound = initialActiveRound + 1;
-
-            //     if (nextRound <= totalRounds) {
-            //         $(`#nav-tab .nav-link[data-round="${nextRound}"]`).append(' 🔁');
-            //     }
-            // });
 
             // Para guadar el resultado de la partida
             $('.form-resultado').on('submit', function(e) {
@@ -327,8 +318,6 @@ try {
             });
 
             // Para la ronda de la revancha
-            // Update the existing JavaScript code
-            // Para la ronda de la revancha
             $('#nav-tab').on('click', '.nav-link', function() {
                 const selectedRound = parseInt($(this).data('round'));
                 const totalRounds = <?= count($rondas) ?>;
@@ -364,6 +353,35 @@ try {
                         $(this).addClass('active');
                     }
                 }.bind(this), 'json');
+            });
+
+            // Para Finalizar Torneo
+            $("#btn-finalizar").click(function(e) {
+                e.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
+
+                // let torneo_id = $("#torneo_id").val(); // Asegurar que el ID está presente
+                let torneo_id = $("select[name='torneo_id']").val();
+
+                if (!torneo_id) {
+                    alert("Error: No se encontró el ID del torneo.");
+                    return;
+                }
+
+                $.post("finalizar_torneo.php", {
+                        action: "btn-finalizar",
+                        torneo_id: torneo_id
+                    })
+                    .done(function(response) {
+                        console.log("Respuesta del servidor:", response);
+                        // alert(response);
+
+
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        console.error("Error en la solicitud:", textStatus, errorThrown);
+                        alert("Hubo un error al finalizar el torneo.");
+
+                    });
             });
 
         });

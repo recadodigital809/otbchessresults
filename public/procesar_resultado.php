@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json'); // ¡Primera línea!
+session_start();
 
 require_once __DIR__ . "/database/connection.php";
 
@@ -11,6 +12,12 @@ try {
     $partida_id = filter_input(INPUT_POST, 'partida_id', FILTER_VALIDATE_INT);
     $resultado = filter_input(INPUT_POST, 'resultado', FILTER_SANITIZE_SPECIAL_CHARS);
     $torneo_id = filter_input(INPUT_POST, 'torneo_id', FILTER_VALIDATE_INT);
+    $googleuser_id = $_SESSION['user_id'] ?? null;
+
+    // throw new Exception($googleuser_id);
+
+    // $googleuser_id = filter_input(INPUT_POST, $_SESSION['user_id'], FILTER_SANITIZE_STRING); // Asegura que el user_id es seguro
+
 
     if (!$partida_id || !$torneo_id) {
         throw new Exception("Parámetros inválidos");
@@ -24,7 +31,7 @@ try {
     }
 
     // Ejecutar consulta (PDO)
-    $stmt = $pdo->prepare("UPDATE db_Partidas SET resultado = :resultado WHERE id = :partida_id AND torneo_id = :torneo_id");
+    $stmt = $pdo->prepare("UPDATE db_Partidas SET resultado = :resultado, google_id = :google_id  WHERE id = :partida_id AND torneo_id = :torneo_id");
     if (!$stmt) {
         throw new Exception("Error en preparación de consulta: " . $pdo->errorInfo()[2]);
     }
@@ -33,6 +40,7 @@ try {
     $stmt->bindValue(':resultado', $resultado, PDO::PARAM_STR);
     $stmt->bindValue(':partida_id', $partida_id, PDO::PARAM_INT);
     $stmt->bindValue(':torneo_id', $torneo_id, PDO::PARAM_INT);
+    $stmt->bindValue(':google_id', $googleuser_id, PDO::PARAM_INT); // Asegura tipo correcto
 
     if (!$stmt->execute()) {
         throw new Exception("Error ejecutando consulta: " . implode(", ", $stmt->errorInfo()));

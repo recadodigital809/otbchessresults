@@ -10,30 +10,30 @@ if (!$torneo_id) {
 }
 
 try {
-    // Verificar si hay partidas sin resultado
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS sin_resultado FROM db_Partidas WHERE torneo_id = ? AND (resultado IS NULL OR resultado = '')");
+    // Obtener lista de partidas sin resultado con ronda y tablero
+    $stmt = $pdo->prepare("SELECT ronda, tablero FROM db_Partidas WHERE torneo_id = ? AND (resultado IS NULL OR resultado = '')");
     $stmt->bindValue(1, $torneo_id, PDO::PARAM_INT);
     $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $partidas_sin_resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (!$result || !isset($result['sin_resultado'])) {
-        echo json_encode(["error" => "Error al obtener los datos de las partidas"]);
-        exit;
-    }
-
-    if ($result['sin_resultado'] > 0) {
-        echo json_encode(["error" => "Hay {$result['sin_resultado']} partidas sin resultado. No se puede finalizar el torneo."]);
+    if (count($partidas_sin_resultado) > 0) {
+        echo json_encode([
+            "error" => "Hay partidas sin resultado. No se puede finalizar el torneo.",
+            "partidas" => $partidas_sin_resultado
+        ]);
         exit;
     }
 
     // Si todas las partidas tienen resultado, finalizar el torneo
+
+    unset($_SESSION['active_round']);
+
     $stmt = $pdo->prepare("UPDATE db_Torneos SET estado = 'finalizado' WHERE id = ?");
     $stmt->bindValue(1, $torneo_id, PDO::PARAM_INT);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
         echo json_encode(["success" => "Torneo finalizado exitosamente"]);
-        // Redirección para evitar reenvío de formulario
         $_SESSION['exito'] = "Torneo creado exitosamente";
         header("Location: agregar_jugadores_torneo.php");
         exit();

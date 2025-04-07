@@ -76,7 +76,7 @@ $jugador_nombre = $stmt_nombre->fetchColumn();
 
 <body>
     <div class="container mt-4">
-        <h2 class="mb-4">Detalle de Partidas de <?= htmlspecialchars($jugador_nombre) ?></h2>
+        <h2 class="mb-4">Partidas de <?= htmlspecialchars($jugador_nombre) ?></h2>
 
         <?php if (count($partidas) === 0): ?>
             <div class="alert alert-info">No se encontraron partidas para este jugador en el torneo seleccionado.</div>
@@ -87,10 +87,10 @@ $jugador_nombre = $stmt_nombre->fetchColumn();
                     <thead class="table-dark">
                         <tr>
                             <th>Ronda</th>
-                            <th>Tablero</th>
+                            <!-- <th>Tablero</th> -->
                             <th>Blancas</th>
                             <th>Negras</th>
-                            <th>Resultado</th>
+                            <th>Logro</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -111,7 +111,7 @@ $jugador_nombre = $stmt_nombre->fetchColumn();
                             ?>
                             <tr class="<?= $esBlancas || $esNegras ? 'table-primary' : '' ?>">
                                 <td><?= htmlspecialchars($p['ronda']) ?></td>
-                                <td><?= htmlspecialchars($p['tablero']) ?></td>
+
                                 <td><?= htmlspecialchars($p['jugador_blancas']) ?></td>
                                 <td><?= htmlspecialchars($p['jugador_negras']) ?></td>
                                 <td><?= htmlspecialchars($p['resultado']) ?></td>
