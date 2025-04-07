@@ -4,13 +4,6 @@ require_once __DIR__ . "/database/connection.php";
 require_once __DIR__ . "/auth.php";
 require_auth($pdo);
 
-// Verificar autenticación Google
-session_start();
-if (empty($_SESSION['user_id'])) {
-    header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
-    exit;
-}
-
 
 // Generar token CSRF
 if (empty($_SESSION['csrf_token'])) {
