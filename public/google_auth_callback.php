@@ -39,7 +39,7 @@ if (isset($_GET['code'])) {
             $user_id = $user['id'];
             // Actualizar google_id si es necesario
             if (empty($user['google_id'])) {
-                $stmt = $pdo->prepare("UPDATE db_Usuarios SET google_id = ? and updated_at = NOW() WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE db_Usuarios SET google_id = ?, updated_at = NOW() WHERE id = ?");
                 $stmt->execute([$google_account->id, $user_id]);
             }
         }
