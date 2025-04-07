@@ -1,29 +1,8 @@
 <?php
 require_once __DIR__ . "/database/connection.php";
 include __DIR__ . '/templates/header.php';
-
-// Autenticación por remember_token si no hay sesión activa
-if (empty($_SESSION['user_id'])) {
-    if (!empty($_COOKIE['remember_token'])) {
-        $token = $_COOKIE['remember_token'];
-
-        $stmt = $pdo->prepare("SELECT id FROM db_Usuarios WHERE remember_token = ?");
-        $stmt->execute([$token]);
-        $user = $stmt->fetch();
-
-        if ($user) {
-            $_SESSION['user_id'] = $user['id'];
-        } else {
-            // Token inválido → redirigir al login
-            header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
-            exit;
-        }
-    } else {
-        // No hay sesión ni cookie → redirigir al login
-        header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
-        exit;
-    }
-}
+require_once __DIR__ . "/auth.php";
+require_auth($pdo);
 
 
 $torneo_id = $_GET['torneo_id'] ?? '';
