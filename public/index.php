@@ -40,8 +40,9 @@ session_start();
     <div class="container mt-5 text-center">
 
         <h1>Bienvenido a Over The Board Chess Results</h1>
-        <p class="lead">Gestiona Ligas, jugadores, torneos y partidos fácilmente.</p>
-        <img src="img\shutterstock_22825027.jpg" alt="Chess Piece" class="img-fluid my-3" style="width: 50%;">
+        <p class="lead">Gestiona ligas, jugadores, torneos y partidos fácilmente.</p>
+        <!-- <img src="img\shutterstock_22825027.jpg" alt="Chess Piece" class="img-fluid my-3" style="width: 50%;"> -->
+        <img src="assets\img\otb_chessresults.png" alt="Chess Piece" class="img-fluid my-3" style="width: 50%;">
         <div class="gap-2">
             <a href="agregar_liga.php" class="btn btn-success btn-sm text-center" style="min-width: 130px;">Agregar Liga</a>
             <a href="nuevo_torneo.php" class="btn btn-primary btn-sm text-center" style="min-width: 130px;">Nuevo Torneo</a>

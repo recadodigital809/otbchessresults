@@ -9,14 +9,9 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Agregar jQuery (no necesario en este caso, ya que Bootstrap lo incluye en bootstrap.bundle.min.js) -->
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
-    <script>
-        $(document).ready(function() {
-            console.log("jQuery cargado y listo para usar.");
-        });
-    </script>
+
+
 </head>
 
 <body>
@@ -30,7 +25,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php" aria-current="page">Home</a></li>
 
                     <!-- Dropdown para Torneos -->
                     <li class="nav-item dropdown">
@@ -39,7 +34,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownTorneos">
                             <li><a class="dropdown-item" href="nuevo_torneo.php">Nuevo Torneo</a></li>
-                            <li><a class="dropdown-item" href="agregar_jugadores_torneo.php">Agregar jugador</a></li>
+                            <li><a class="dropdown-item" href="agregar_jugadores_torneo.php">Agregar Jugador</a></li>
                             <li><a class="dropdown-item" href="partidas.php">Emparejamiento</a></li>
                         </ul>
                     </li>
@@ -47,12 +42,11 @@
                     <!-- Dropdown para Jugadores -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownJugadores" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            jugadores
+                            Jugadores
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownJugadores">
-                            <li><a class="dropdown-item" href="ingresar_jugadores.php">Agregar jugador</a></li>
-                            <!-- <li><a class="dropdown-item" href="profile.php">Perfil Jugador</a></li> -->
-                            <li><a class="dropdown-item" href="listado_jugadores.php">Lista de jugadores</a></li>
+                            <li><a class="dropdown-item" href="ingresar_jugadores.php">Agregar Jugador</a></li>
+                            <li><a class="dropdown-item" href="listado_jugadores.php">Lista de Jugadores</a></li>
                         </ul>
                     </li>
 
@@ -61,7 +55,6 @@
             </div>
         </div>
     </nav>
-
     <!-- Bootstrap JS (incluye Popper.js y los componentes de Bootstrap) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
 
