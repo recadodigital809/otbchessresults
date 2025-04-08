@@ -76,7 +76,11 @@ $jugador_nombre = $stmt_nombre->fetchColumn();
 
 <body>
     <div class="container mt-4">
-        <h2 class="mb-4">Partidas de <?= htmlspecialchars($jugador_nombre) ?></h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Partidas de <?= htmlspecialchars($jugador_nombre) ?></h2>
+            <a href="resultados.php?torneo_id=<?= urlencode($torneo_id) ?>" class="btn btn-secondary">⬅ Volver a Resultados</a>
+        </div>
+
 
         <?php if (count($partidas) === 0): ?>
             <div class="alert alert-info">No se encontraron partidas para este jugador en el torneo seleccionado.</div>

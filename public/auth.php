@@ -1,5 +1,6 @@
-// auth.php
-function require_auth($pdo) {
+<?php
+function require_auth($pdo)
+{
     session_start();
     if (empty($_SESSION['user_id'])) {
         if (!empty($_COOKIE['remember_token'])) {

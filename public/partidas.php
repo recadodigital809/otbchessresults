@@ -63,7 +63,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partidas del Torneo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <style>
         html,
         body {
@@ -257,9 +257,15 @@ try {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
 
+            $(function() {
+                const initialActiveRound = <?= $active_round ?? 1 ?>;
+                // Simular click en la pestaña activa
+                $(`#nav-tab .nav-link[data-round="${initialActiveRound}"]`).trigger('click');
+            });
 
             // Para guadar el resultado de la partida
             $('.form-resultado').on('submit', function(e) {
@@ -283,7 +289,7 @@ try {
                             setTimeout(() => {
                                 $form.removeClass('bg-success-light');
                                 $button.html('<i class="bi bi-save"></i> Guardado!').prop('disabled', false).addClass('bg-info');
-                            }, 1000);
+                            }, 300);
                         } else {
                             const errorMsg = response?.error ?? 'Error desconocido';
                             console.error('Error en la respuesta:', response);
@@ -369,7 +375,7 @@ try {
                     })
                     .done(function(response) {
                         console.log("Respuesta del servidor:", response);
-                        // alert(response);
+                        alert(response);
 
 
                     })
