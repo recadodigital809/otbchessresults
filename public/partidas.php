@@ -323,8 +323,6 @@ try {
             $('#nav-tab').on('click', '.nav-link', function() {
                 const selectedRound = parseInt($(this).data('round'));
                 const totalRounds = <?= count($rondas) ?>;
-                // const nextRound = selectedRound + (totalRounds / 2);
-                // const nextRound = selectedRound + (totalRounds / 2);
 
                 let nextRound;
 
@@ -375,13 +373,13 @@ try {
                     })
                     .done(function(response) {
                         console.log("Respuesta del servidor:", response);
-                        alert(response);
+                        alert("✅ ¡Torneo finalizado con éxito!");
 
 
                     })
                     .fail(function(jqXHR, textStatus, errorThrown) {
                         console.error("Error en la solicitud:", textStatus, errorThrown);
-                        alert("Hubo un error al finalizar el torneo.");
+                        alert("❌ Hubo un error al finalizar el torneo.");
 
                     });
             });
