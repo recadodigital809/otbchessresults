@@ -400,7 +400,7 @@ try {
         });
     </script>
 
-
+    <?php include __DIR__ . '/templates/footer.php'; ?>
 </body>
 
 </html>
