@@ -357,32 +357,45 @@ try {
 
             // Para Finalizar Torneo
             $("#btn-finalizar").click(function(e) {
-                e.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
+                e.preventDefault();
 
-                // let torneo_id = $("#torneo_id").val(); // Asegurar que el ID está presente
                 let torneo_id = $("select[name='torneo_id']").val();
 
                 if (!torneo_id) {
-                    alert("Error: No se encontró el ID del torneo.");
+                    alert("⚠️ Error: No se encontró el ID del torneo.");
                     return;
                 }
 
                 $.post("finalizar_torneo.php", {
-                        action: "btn-finalizar",
                         torneo_id: torneo_id
                     })
                     .done(function(response) {
-                        console.log("Respuesta del servidor:", response);
-                        alert("✅ ¡Torneo finalizado con éxito!");
-
-
+                        // Asegurarse de que la respuesta es JSON
+                        if (response.success) {
+                            alert("✅ ¡Torneo finalizado con éxito!");
+                            setTimeout(() => {
+                                location.reload(); // o redirigir si preferís: window.location.href = "agregar_jugadores_torneo.php";
+                            }, 1000);
+                        } else if (response.error) {
+                            let mensaje = "❌ " + response.error;
+                            if (response.partidas && Array.isArray(response.partidas)) {
+                                mensaje += "\n\nPartidas sin resultado:\n";
+                                response.partidas.forEach(p => {
+                                    mensaje += `• Ronda ${p.ronda}, Tablero ${p.tablero}\n`;
+                                });
+                            }
+                            alert(mensaje);
+                        } else {
+                            alert("⚠️ Respuesta inesperada del servidor.");
+                            console.log("Respuesta cruda:", response);
+                        }
                     })
                     .fail(function(jqXHR, textStatus, errorThrown) {
                         console.error("Error en la solicitud:", textStatus, errorThrown);
-                        alert("❌ Hubo un error al finalizar el torneo.");
-
+                        alert("❌ Hubo un error de red o del servidor.");
                     });
             });
+
 
         });
     </script>
