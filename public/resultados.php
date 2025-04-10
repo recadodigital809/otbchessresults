@@ -5,6 +5,7 @@ require_once __DIR__ . "/auth.php";
 require_auth($pdo);
 
 
+
 $torneo_id = $_GET['torneo_id'] ?? '';
 $resultados = [];
 
