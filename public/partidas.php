@@ -184,6 +184,7 @@ try {
 
                 <!-- Contenido de Rondas -->
                 <div class="tab-content" id="nav-tabContent">
+                   <?php var_dump($rondas); // <-- AQUÍ, para depurar la estructura de datos ?>
                     <?php foreach ($rondas as $num_ronda => $partidas_ronda): ?>
                         <?php
                         // Ordenar las partidas por tablero antes de iterar
